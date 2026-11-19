@@ -1,8 +1,8 @@
 // Guarda la app en el teléfono para que abra aunque no haya señal en el campo.
-const VERSION = 'pv-campo-v1';
+const VERSION = 'pv-campo-v2';
 const ARCHIVOS = [
   './', './index.html', './styles.css', './manifest.webmanifest', './icono.svg',
-  './js/app.js', './js/solar.js', './js/pv.js', './js/grafica.js',
+  './js/app.js', './js/solar.js', './js/pv.js', './js/grafica.js', './js/escena.js', './js/modulo.js',
 ];
 
 self.addEventListener('install', (e) => {

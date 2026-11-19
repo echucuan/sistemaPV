@@ -96,4 +96,5 @@ export function grafica(contenedor, o) {
     }
   }
   contenedor.replaceChildren(svg);
+  return { svg, sx, sy, m, W, H };
 }

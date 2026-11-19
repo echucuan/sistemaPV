@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#0f5c8c">
   <title>Sol y paneles en campo</title>
-  <meta name="description" content="Radiación solar mensual, inclinación óptima de paneles y curvas I-V/P-V para cualquier coordenada.">
+  <meta name="description" content="Recorrido del sol, inclinación óptima de paneles mes a mes y curvas I-V/P-V, para aprender en campo.">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icono.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
@@ -15,12 +15,19 @@
 <body>
   <header class="cabecera">
     <h1>☀️ Sol y paneles en campo</h1>
-    <p>Encuentra la inclinación con la que tus paneles generan más energía cada mes y observa cómo cambian sus curvas I-V y P-V.</p>
+    <p>Descubre cómo se mueve el sol, por qué los paneles se inclinan y cuánta energía generan donde estás parado.</p>
+    <nav class="pasos" aria-label="Secciones">
+      <a href="#s-ubic"><span>1</span>Ubicación</a>
+      <a href="#s-sol"><span>2</span>El sol</a>
+      <a href="#s-estaciones"><span>3</span>Estaciones</a>
+      <a href="#s-tabla"><span>4</span>Mes a mes</a>
+      <a href="#s-panel"><span>5</span>Tu panel</a>
+    </nav>
   </header>
 
   <main>
     <!-- 1. Ubicación -->
-    <section class="tarjeta" aria-labelledby="t-ubic">
+    <section class="tarjeta" id="s-ubic" aria-labelledby="t-ubic">
       <h2 id="t-ubic"><span class="num">1</span> ¿Dónde estás?</h2>
       <form id="form-ubicacion" class="ubicacion" novalidate>
         <label>Latitud
@@ -38,17 +45,75 @@
       <p id="estado" class="estado" role="status" aria-live="polite"></p>
     </section>
 
-    <!-- 2. Resumen anual -->
-    <section class="tarjeta" aria-labelledby="t-resumen">
-      <h2 id="t-resumen"><span class="num">2</span> Resumen del año</h2>
-      <div id="resumen" class="kpis"></div>
+    <!-- 2. El viaje del sol -->
+    <section class="tarjeta" id="s-sol" aria-labelledby="t-sol">
+      <h2 id="t-sol"><span class="num">2</span> El viaje del sol en un día</h2>
+      <p class="ayuda">Estás parado detrás del panel, mirando hacia el <b class="rumbo-ecuador">sur</b>. Elige un mes y presiona ▶:
+        observa el recorrido del sol, la sombra, los rayos y cómo se iluminan las celdas.</p>
+
+      <div class="meses" id="meses" role="group" aria-label="Mes"></div>
+
+      <div class="escena-marco">
+        <div id="escena"></div>
+        <div class="escena-hud" aria-live="off">
+          <span id="hud-hora" class="hud-hora"></span>
+          <span id="hud-g" class="hud-g"></span>
+        </div>
+      </div>
+
+      <div class="reproductor">
+        <button type="button" id="btn-play" class="play" aria-label="Reproducir el día">▶</button>
+        <label class="hora"><span>Hora solar: <output id="o-hora"></output></span>
+          <input id="r-hora" type="range" min="4" max="20" step="0.05">
+        </label>
+      </div>
+
+      <div class="lecturas" id="lecturas"></div>
+
+      <div class="inclinacion">
+        <label><span>Inclinación del panel β: <output id="o-beta"></output>°</span>
+          <input id="r-beta" type="range" min="0" max="90" step="1">
+        </label>
+        <div class="botones">
+          <button type="button" id="btn-optimo" class="secundario">🎯 Óptimo del mes</button>
+          <button type="button" id="btn-plano" class="secundario">▭ Acostado 0°</button>
+        </div>
+      </div>
+
+      <div class="reto" id="reto" aria-live="polite"></div>
+
+      <h3>Potencia del panel durante el día</h3>
+      <div id="g-dia" class="contenedor-grafica"></div>
+
+      <aside class="idea">
+        <strong>💡 Idea clave</strong>
+        El panel recibe más energía cuando los rayos le llegan <em>de frente</em>, es decir, cuando el
+        ángulo de incidencia θ (entre el rayo y la línea punteada perpendicular al panel) es pequeño.
+      </aside>
     </section>
 
-    <!-- 3. Tabla mensual -->
-    <section class="tarjeta" aria-labelledby="t-tabla">
-      <h2 id="t-tabla"><span class="num">3</span> Ángulo óptimo mes a mes</h2>
+    <!-- 3. Estaciones -->
+    <section class="tarjeta" id="s-estaciones" aria-labelledby="t-est">
+      <h2 id="t-est"><span class="num">3</span> ¿Por qué cambia el ángulo con las estaciones?</h2>
+      <p class="ayuda">Vista de lado al mediodía. Mueve el control de los meses y mira cómo sube y baja el sol.</p>
+      <div id="lateral"></div>
+      <label class="mes-deslizador"><span>Mes: <output id="o-mes"></output></span>
+        <input id="r-mes" type="range" min="0" max="11" step="1">
+      </label>
+      <p id="texto-lateral" class="explica"></p>
+      <aside class="idea">
+        <strong>💡 Idea clave</strong>
+        Al mediodía los rayos quedan perpendiculares al panel cuando <b>β = 90° − α</b>, donde α es la altura del sol.
+        En invierno el sol va bajo y el panel se levanta; en verano el sol pasa casi encima y el panel se acuesta.
+      </aside>
+    </section>
+
+    <!-- 4. Mes a mes -->
+    <section class="tarjeta" id="s-tabla" aria-labelledby="t-tabla">
+      <h2 id="t-tabla"><span class="num">4</span> Ángulo óptimo mes a mes</h2>
+      <div id="resumen" class="kpis"></div>
       <p class="ayuda">Inclina el panel desde el suelo (0° = acostado) y oriéntalo hacia el <strong id="orientacion">sur</strong>.
-        Toca un mes para ver sus curvas.</p>
+        Toca un mes para verlo en todas las secciones.</p>
       <div class="tabla-scroll">
         <table class="tabla">
           <thead>
@@ -69,9 +134,9 @@
       <div id="g-inclinacion" class="contenedor-grafica"></div>
     </section>
 
-    <!-- 4. Curvas -->
-    <section class="tarjeta" aria-labelledby="t-curvas">
-      <h2 id="t-curvas"><span class="num">4</span> Curvas I-V y P-V <span id="mes-curvas" class="chip"></span></h2>
+    <!-- 5. Tu panel -->
+    <section class="tarjeta" id="s-panel" aria-labelledby="t-curvas">
+      <h2 id="t-curvas"><span class="num">5</span> Tu panel por dentro <span id="mes-curvas" class="chip"></span></h2>
 
       <label class="campo-select">Módulo
         <select id="sel-modulo"></select>
@@ -84,42 +149,67 @@
       </details>
 
       <div class="controles">
-        <label><span>Irradiancia sobre el panel: <output id="o-g"></output> W/m²</span>
+        <label><span>☀️ Irradiancia sobre el panel: <output id="o-g"></output> W/m²</span>
           <input id="r-g" type="range" min="0" max="1200" step="10">
         </label>
-        <label><span>Temperatura del aire: <output id="o-t"></output> °C</span>
+        <label><span>🌡️ Temperatura del aire: <output id="o-t"></output> °C</span>
           <input id="r-t" type="range" min="-10" max="50" step="0.5">
         </label>
-        <p class="ayuda">Los valores iniciales corresponden al mediodía del mes elegido con el ángulo óptimo.
-          Mueve los controles para experimentar.</p>
+        <p class="ayuda">Empieza con el mediodía del mes elegido. Tapa el sol (baja la irradiancia) o calienta el panel y observa.</p>
       </div>
 
+      <div id="modulo" class="modulo-marco"></div>
+      <label class="interruptor"><input type="checkbox" id="chk-serie" checked> Mostrar cómo se conectan las celdas en serie</label>
+
       <div id="kpis-pv" class="kpis"></div>
-      <h3>Curva I-V</h3>
+
+      <aside class="idea">
+        <strong>💡 Idea clave</strong>
+        Más sol ⇒ más <b>corriente</b> (la curva sube). Más calor ⇒ menos <b>voltaje</b> (la curva se recorre a la izquierda).
+        El punto naranja es donde el panel da su potencia máxima.
+      </aside>
+
+      <h3>Curva I-V (corriente contra voltaje)</h3>
       <div id="g-iv" class="contenedor-grafica"></div>
-      <h3>Curva P-V</h3>
+      <h3>Curva P-V (potencia contra voltaje)</h3>
       <div id="g-pv" class="contenedor-grafica"></div>
       <p class="ayuda">La línea gris punteada es el módulo en condiciones estándar (STC: 1000 W/m² y 25 °C de celda).</p>
     </section>
 
+    <section class="tarjeta" aria-labelledby="t-glosario">
+      <details>
+        <summary><h2 id="t-glosario">📖 Glosario</h2></summary>
+        <dl class="glosario">
+          <dt>Irradiancia (W/m²)</dt><dd>Potencia del sol que llega a cada metro cuadrado en un instante. Al mediodía despejado ≈ 1000 W/m².</dd>
+          <dt>Irradiación (kWh/m²)</dt><dd>Energía acumulada en un tiempo (un día, un mes): la irradiancia sumada a lo largo de las horas.</dd>
+          <dt>Altura del sol α</dt><dd>Ángulo del sol sobre el horizonte. 0° al salir, máximo al mediodía solar.</dd>
+          <dt>Inclinación β</dt><dd>Ángulo entre el panel y el suelo. 0° acostado, 90° vertical.</dd>
+          <dt>Ángulo de incidencia θ</dt><dd>Ángulo entre el rayo de sol y la perpendicular al panel. Con θ = 0° el panel capta lo máximo.</dd>
+          <dt>Voc · Isc</dt><dd>Voltaje con el circuito abierto (sin corriente) y corriente en cortocircuito (sin voltaje).</dd>
+          <dt>Pmp · Vmp · Imp</dt><dd>Potencia máxima y el voltaje y la corriente a los que se obtiene.</dd>
+          <dt>NOCT</dt><dd>Temperatura que alcanza la celda con 800 W/m², 20 °C de aire y algo de viento. Sirve para estimar qué tan caliente se pone.</dd>
+        </dl>
+      </details>
+    </section>
+
     <section class="tarjeta" aria-labelledby="t-metodo">
       <details>
-        <summary><h2 id="t-metodo">¿Cómo se calcula?</h2></summary>
+        <summary><h2 id="t-metodo">🧮 ¿Cómo se calcula?</h2></summary>
         <div class="metodo">
           <p><strong>Datos:</strong> promedios mensuales de 2001 a 2025 de irradiación global y difusa y de temperatura de
             <a href="https://power.larc.nasa.gov/" target="_blank" rel="noopener">NASA POWER</a>. Sin internet se usa un
             modelo de cielo despejado (índice de claridad 0.72), que sobrestima la radiación porque no considera nubes.</p>
-          <p><strong>Plano inclinado:</strong> modelo isotrópico de Liu-Jordan con el método de Klein para el día
-            representativo de cada mes: H<sub>T</sub> = H<sub>b</sub>·R<sub>b</sub> + H<sub>d</sub>(1+cos β)/2 + H·ρ(1−cos β)/2,
-            con albedo ρ = 0.2. Se prueban inclinaciones de 0° a 90° en pasos de 1° y se elige la de mayor energía.
-            El <em>ángulo fijo anual</em> es el que maximiza la suma de los 12 meses.</p>
-          <p><strong>Irradiancia al mediodía:</strong> fracción horaria de Collares-Pereira y Rabl aplicada a H<sub>T</sub>.</p>
+          <p><strong>Posición del sol:</strong> declinación de Cooper y ángulo horario para el día representativo de cada mes (hora solar).</p>
+          <p><strong>Plano inclinado:</strong> modelo isotrópico de Liu-Jordan con el método de Klein:
+            H<sub>T</sub> = H<sub>b</sub>·R<sub>b</sub> + H<sub>d</sub>(1+cos β)/2 + H·ρ(1−cos β)/2, con albedo ρ = 0.2.
+            Se prueban inclinaciones de 0° a 90° y se elige la de mayor energía.</p>
+          <p><strong>Durante el día:</strong> la irradiación del mes se reparte por hora con las fracciones de Collares-Pereira y Rabl
+            (global) y de Liu-Jordan (difusa), y se ajusta para que el total del día coincida con H<sub>T</sub>.</p>
           <p><strong>Módulo:</strong> modelo de un diodo,
             I = I<sub>pv</sub> − I<sub>0</sub>[e<sup>(V+IR<sub>s</sub>)/(aV<sub>t</sub>)</sup> − 1] − (V+IR<sub>s</sub>)/R<sub>p</sub>,
-            con R<sub>s</sub> y R<sub>p</sub> ajustadas a la hoja de datos (método de Villalva, 2009). Temperatura de celda:
+            con R<sub>s</sub> y R<sub>p</sub> ajustadas a la hoja de datos (Villalva, 2009). Temperatura de celda:
             T<sub>c</sub> = T<sub>a</sub> + (NOCT − 20)·G/800.</p>
-          <p><strong>Energía del mes:</strong> eficiencia del módulo al mediodía × H<sub>T</sub> × días del mes. Es una estimación
-            sin pérdidas de cableado, suciedad ni inversor.</p>
+          <p><strong>Energía:</strong> sin pérdidas de cableado, suciedad ni inversor (estimación optimista).</p>
         </div>
       </details>
     </section>

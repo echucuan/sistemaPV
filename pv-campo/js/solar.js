@@ -140,3 +140,54 @@ export function analisisAngulos(datos, lat, { rho = 0.2, paso = 1 } = {}) {
     },
   };
 }
+
+// ---------- Valores instantáneos (para la animación del día) ----------
+
+/** Posición del sol para la hora solar `hora` (0–24) del día n. Ángulos en grados; azimut desde el norte, horario. */
+export function posicionSol(lat, n, hora) {
+  const d = rad(declinacion(n)), phi = rad(lat), w = rad(15 * (hora - 12));
+  const sinEl = Math.sin(phi) * Math.sin(d) + Math.cos(phi) * Math.cos(d) * Math.cos(w);
+  const el = Math.asin(clamp(sinEl, -1, 1));
+  // Componentes en ejes Este, Norte, Arriba.
+  const este = -Math.cos(d) * Math.sin(w);
+  const norte = Math.cos(phi) * Math.sin(d) - Math.sin(phi) * Math.cos(d) * Math.cos(w);
+  let az = deg(Math.atan2(este, norte));
+  if (az < 0) az += 360;
+  return { elevacion: deg(el), azimut: az, vector: [este, norte, sinEl] };
+}
+
+/** Horas solares de salida y puesta del sol. */
+export function salidaPuesta(lat, n) {
+  const ws = anguloPuesta(lat, declinacion(n)) / 15;
+  return { salida: 12 - ws, puesta: 12 + ws };
+}
+
+/**
+ * Irradiancias instantáneas (W/m²) a partir de la irradiación diaria del mes,
+ * repartida en el día con las fracciones horarias de Collares-Pereira & Rabl (global) y Liu-Jordan (difusa).
+ * El panel mira al ecuador con inclinación beta.
+ */
+export function irradianciaInstante(lat, n, hora, beta, H, Hd, rho = 0.2) {
+  const ws = anguloPuesta(lat, declinacion(n));
+  const wsr = rad(ws), w = rad(15 * (hora - 12));
+  const sol = posicionSol(lat, n, hora);
+  if (Math.abs(15 * (hora - 12)) >= ws || sol.elevacion <= 0) {
+    return { ...sol, cosTheta: 0, incidencia: 90, gh: 0, gt: 0, gtDirecta: 0 };
+  }
+  const den = Math.sin(wsr) - wsr * Math.cos(wsr);
+  const a = 0.409 + 0.5016 * Math.sin(wsr - Math.PI / 3);
+  const b = 0.6609 - 0.4767 * Math.sin(wsr - Math.PI / 3);
+  const rt = (Math.PI / 24) * (a + b * Math.cos(w)) * (Math.cos(w) - Math.cos(wsr)) / den;
+  const rd = (Math.PI / 24) * (Math.cos(w) - Math.cos(wsr)) / den;
+  const gh = Math.max(0, rt * H * 1000);
+  const gd = Math.min(gh, Math.max(0, rd * Hd * 1000));
+  // Normal del panel: hacia el ecuador e inclinada beta.
+  const s = lat >= 0 ? -1 : 1;
+  const nrm = [0, s * Math.sin(rad(beta)), Math.cos(rad(beta))];
+  const v = sol.vector;
+  const cosTheta = Math.max(0, nrm[0] * v[0] + nrm[1] * v[1] + nrm[2] * v[2]);
+  const sinEl = Math.max(0.05, v[2]);
+  const directa = Math.min((gh - gd) * (cosTheta / sinEl), (gh - gd) * 6);
+  const gt = directa + gd * (1 + Math.cos(rad(beta))) / 2 + gh * rho * (1 - Math.cos(rad(beta))) / 2;
+  return { ...sol, cosTheta, incidencia: deg(Math.acos(cosTheta)), gh, gt: Math.max(0, gt), gtDirecta: directa };
+}

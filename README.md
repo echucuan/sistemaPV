@@ -8,10 +8,15 @@ Apps web para clase. Funcionan en el celular, sin instalar nada.
 
 ## Sol y paneles en campo (`pv-campo/`)
 
-1. **Ubicación:** GPS del teléfono o coordenadas escritas a mano. Viene precargado el campo de fútbol del Tec campus Sinaloa (24.80346, −107.42182).
-2. **Radiación:** promedios mensuales de 2001 a 2025 de NASA POWER (irradiación global y difusa, temperatura). Sin internet usa un modelo de cielo despejado y lo indica.
-3. **Tabla mes a mes:** inclinación con la que el panel recibe más energía (modelo isotrópico de Liu-Jordan, de 0° a 90°), comparada contra el panel horizontal y el ángulo fijo anual.
-4. **Curvas I-V y P-V:** módulos genéricos de 100, 450 y 550 W con datos editables. Al tocar un mes, las curvas usan la irradiancia y la temperatura típicas de ese mes al mediodía.
+Recorrido guiado en cinco pasos; el mes elegido se sincroniza en todas las secciones.
+
+1. **¿Dónde estás?** GPS del teléfono o coordenadas escritas a mano. Viene precargado el campo de fútbol del Tec campus Sinaloa (24.80346, −107.42182). Radiación de NASA POWER (2001–2025); sin internet usa un modelo de cielo despejado y lo indica.
+2. **El viaje del sol en un día:** escena 3D animada, vista desde detrás del panel mirando al ecuador. El sol recorre la cúpula del cielo y se ven la sombra, los rayos, el ángulo de incidencia θ y cómo se iluminan las celdas. Muestra lecturas en vivo (altura y dirección del sol, irradiancia, potencia, energía acumulada), una gráfica de potencia del día y un **reto** para encontrar la inclinación que da más energía.
+3. **¿Por qué cambia el ángulo con las estaciones?** Vista lateral al mediodía con la altura del sol α y la inclinación β, animada mes a mes (β = 90° − α).
+4. **Mes a mes:** tabla de la inclinación óptima (modelo isotrópico de Liu-Jordan), comparada contra el panel horizontal y el ángulo fijo anual.
+5. **Tu panel por dentro:** el módulo con sus celdas en serie conectado a un foco; la corriente fluye más rápido con más amperes. Curvas I-V y P-V (modelo de un diodo) de módulos genéricos de 100, 450 y 550 W con datos editables.
+
+Incluye glosario, explicación del método y respeta la preferencia de "reducir movimiento" del teléfono.
 
 Se puede compartir una ubicación con un enlace: `pv-campo/?lat=24.80346&lon=-107.42182`.
 

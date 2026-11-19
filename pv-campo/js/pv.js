@@ -174,3 +174,18 @@ export function curvas(mod, G, Tc, puntos = 140) {
   const vm = (a + b) / 2, im = corriente(vm, p);
   return { V, I, P, voc, isc: corriente(0, p), mpp: { v: vm, i: im, p: vm * im } };
 }
+
+/** Solo la potencia máxima (más rápido que `curvas`, para animaciones). */
+export function potenciaMaxima(mod, G, Tc) {
+  if (G <= 1) return 0;
+  const p = parametrosOperacion(mod, G, Tc);
+  const pot = (v) => v * corriente(v, p);
+  const gr = (Math.sqrt(5) - 1) / 2;
+  let a = 0, b = mod.voc * 1.3;
+  let c = b - gr * (b - a), d = a + gr * (b - a);
+  for (let k = 0; k < 40; k++) {
+    if (pot(c) > pot(d)) b = d; else a = c;
+    c = b - gr * (b - a); d = a + gr * (b - a);
+  }
+  return Math.max(0, pot((a + b) / 2));
+}
