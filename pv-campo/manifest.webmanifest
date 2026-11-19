@@ -1,0 +1,11 @@
+{
+  "name": "Sol y paneles en campo",
+  "short_name": "Sol y paneles",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f6f9",
+  "theme_color": "#0f5c8c",
+  "icons": [{ "src": "icono.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

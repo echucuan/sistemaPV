@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#0f5c8c">
+  <title>Sol y paneles en campo</title>
+  <meta name="description" content="Radiación solar mensual, inclinación óptima de paneles y curvas I-V/P-V para cualquier coordenada.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icono.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="cabecera">
+    <h1>☀️ Sol y paneles en campo</h1>
+    <p>Encuentra la inclinación con la que tus paneles generan más energía cada mes y observa cómo cambian sus curvas I-V y P-V.</p>
+  </header>
+
+  <main>
+    <!-- 1. Ubicación -->
+    <section class="tarjeta" aria-labelledby="t-ubic">
+      <h2 id="t-ubic"><span class="num">1</span> ¿Dónde estás?</h2>
+      <form id="form-ubicacion" class="ubicacion" novalidate>
+        <label>Latitud
+          <input id="lat" name="lat" type="number" inputmode="decimal" step="any" min="-66" max="66" required>
+        </label>
+        <label>Longitud
+          <input id="lon" name="lon" type="number" inputmode="decimal" step="any" min="-180" max="180" required>
+        </label>
+        <div class="botones">
+          <button type="button" id="btn-gps" class="secundario">📍 Usar mi GPS</button>
+          <button type="button" id="btn-campo" class="secundario">⚽ Campo Tec Sinaloa</button>
+          <button type="submit" class="primario">Calcular</button>
+        </div>
+      </form>
+      <p id="estado" class="estado" role="status" aria-live="polite"></p>
+    </section>
+
+    <!-- 2. Resumen anual -->
+    <section class="tarjeta" aria-labelledby="t-resumen">
+      <h2 id="t-resumen"><span class="num">2</span> Resumen del año</h2>
+      <div id="resumen" class="kpis"></div>
+    </section>
+
+    <!-- 3. Tabla mensual -->
+    <section class="tarjeta" aria-labelledby="t-tabla">
+      <h2 id="t-tabla"><span class="num">3</span> Ángulo óptimo mes a mes</h2>
+      <p class="ayuda">Inclina el panel desde el suelo (0° = acostado) y oriéntalo hacia el <strong id="orientacion">sur</strong>.
+        Toca un mes para ver sus curvas.</p>
+      <div class="tabla-scroll">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th scope="col">Mes</th>
+              <th scope="col">Ángulo<br>óptimo</th>
+              <th scope="col">Con ángulo<br>óptimo<br><small>kWh/m²·d</small></th>
+              <th scope="col">Horizontal<br><small>kWh/m²·d</small></th>
+              <th scope="col">Ganancia</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-meses"></tbody>
+        </table>
+      </div>
+      <h3>Ángulo óptimo durante el año</h3>
+      <div id="g-angulos" class="contenedor-grafica"></div>
+      <h3 id="t-curva-mes">Energía según la inclinación</h3>
+      <div id="g-inclinacion" class="contenedor-grafica"></div>
+    </section>
+
+    <!-- 4. Curvas -->
+    <section class="tarjeta" aria-labelledby="t-curvas">
+      <h2 id="t-curvas"><span class="num">4</span> Curvas I-V y P-V <span id="mes-curvas" class="chip"></span></h2>
+
+      <label class="campo-select">Módulo
+        <select id="sel-modulo"></select>
+      </label>
+      <details class="datos-modulo">
+        <summary>Datos de la hoja del módulo (editables)</summary>
+        <div id="campos-modulo" class="rejilla-campos"></div>
+        <p id="errores-modulo" class="error" role="alert"></p>
+        <button type="button" id="btn-restaurar" class="secundario">Restaurar valores</button>
+      </details>
+
+      <div class="controles">
+        <label><span>Irradiancia sobre el panel: <output id="o-g"></output> W/m²</span>
+          <input id="r-g" type="range" min="0" max="1200" step="10">
+        </label>
+        <label><span>Temperatura del aire: <output id="o-t"></output> °C</span>
+          <input id="r-t" type="range" min="-10" max="50" step="0.5">
+        </label>
+        <p class="ayuda">Los valores iniciales corresponden al mediodía del mes elegido con el ángulo óptimo.
+          Mueve los controles para experimentar.</p>
+      </div>
+
+      <div id="kpis-pv" class="kpis"></div>
+      <h3>Curva I-V</h3>
+      <div id="g-iv" class="contenedor-grafica"></div>
+      <h3>Curva P-V</h3>
+      <div id="g-pv" class="contenedor-grafica"></div>
+      <p class="ayuda">La línea gris punteada es el módulo en condiciones estándar (STC: 1000 W/m² y 25 °C de celda).</p>
+    </section>
+
+    <section class="tarjeta" aria-labelledby="t-metodo">
+      <details>
+        <summary><h2 id="t-metodo">¿Cómo se calcula?</h2></summary>
+        <div class="metodo">
+          <p><strong>Datos:</strong> promedios mensuales de 2001 a 2025 de irradiación global y difusa y de temperatura de
+            <a href="https://power.larc.nasa.gov/" target="_blank" rel="noopener">NASA POWER</a>. Sin internet se usa un
+            modelo de cielo despejado (índice de claridad 0.72), que sobrestima la radiación porque no considera nubes.</p>
+          <p><strong>Plano inclinado:</strong> modelo isotrópico de Liu-Jordan con el método de Klein para el día
+            representativo de cada mes: H<sub>T</sub> = H<sub>b</sub>·R<sub>b</sub> + H<sub>d</sub>(1+cos β)/2 + H·ρ(1−cos β)/2,
+            con albedo ρ = 0.2. Se prueban inclinaciones de 0° a 90° en pasos de 1° y se elige la de mayor energía.
+            El <em>ángulo fijo anual</em> es el que maximiza la suma de los 12 meses.</p>
+          <p><strong>Irradiancia al mediodía:</strong> fracción horaria de Collares-Pereira y Rabl aplicada a H<sub>T</sub>.</p>
+          <p><strong>Módulo:</strong> modelo de un diodo,
+            I = I<sub>pv</sub> − I<sub>0</sub>[e<sup>(V+IR<sub>s</sub>)/(aV<sub>t</sub>)</sup> − 1] − (V+IR<sub>s</sub>)/R<sub>p</sub>,
+            con R<sub>s</sub> y R<sub>p</sub> ajustadas a la hoja de datos (método de Villalva, 2009). Temperatura de celda:
+            T<sub>c</sub> = T<sub>a</sub> + (NOCT − 20)·G/800.</p>
+          <p><strong>Energía del mes:</strong> eficiencia del módulo al mediodía × H<sub>T</sub> × días del mes. Es una estimación
+            sin pérdidas de cableado, suciedad ni inversor.</p>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <footer class="pie">
+    Simulaciones fotovoltaicas · <a href="../">sistemaPV</a>
+  </footer>
+</body>
+</html>

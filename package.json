@@ -1,0 +1,9 @@
+{
+  "name": "sistema-pv",
+  "private": true,
+  "type": "module",
+  "description": "Simulaciones de sistemas fotovoltaicos para clase",
+  "scripts": {
+    "test": "node tests/modelos.test.js"
+  }
+}

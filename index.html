@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Simulaciones fotovoltaicas</title>
+  <link rel="icon" href="pv-campo/icono.svg" type="image/svg+xml">
+  <style>
+    :root { --fondo:#f3f6f9; --tarjeta:#fff; --texto:#17212b; --suave:#5b6b7a; --borde:#dbe3ea; --acento:#0f5c8c; }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) { --fondo:#0e141a; --tarjeta:#18212a; --texto:#e6edf3; --suave:#9aabbb; --borde:#2a3743; --acento:#5fb3e6; }
+    }
+    body { margin:0; background:var(--fondo); color:var(--texto); font:16px/1.5 system-ui, sans-serif; }
+    main { max-width:720px; margin:0 auto; padding:24px 16px; }
+    h1 { margin:0 0 4px; } p { color:var(--suave); margin:0 0 20px; }
+    a.app { display:block; background:var(--tarjeta); border:1px solid var(--borde); border-radius:14px;
+      padding:16px; color:inherit; text-decoration:none; margin-bottom:12px; }
+    a.app:hover, a.app:focus-visible { border-color:var(--acento); }
+    a.app strong { color:var(--acento); font-size:1.1rem; }
+    a.app span { display:block; color:var(--suave); font-size:.92rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Simulaciones fotovoltaicas</h1>
+    <p>Apps para explorar sistemas fotovoltaicos en clase y en campo.</p>
+    <a class="app" href="pv-campo/">
+      <strong>☀️ Sol y paneles en campo</strong>
+      <span>Radiación solar mensual (NASA POWER), ángulo óptimo de los paneles mes a mes y curvas I-V y P-V del módulo.</span>
+    </a>
+  </main>
+</body>
+</html>
