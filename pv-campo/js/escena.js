@@ -292,8 +292,7 @@ export function crearVistaLateral(contenedor) {
 
   function actualizar(objetivo, { animar = true } = {}) {
     cancelAnimationFrame(anim);
-    const reducir = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!actual || !animar || reducir) { actual = { ...objetivo }; dibujar(actual); return; }
+    if (!actual || !animar) { actual = { ...objetivo }; dibujar(actual); return; }
     const ini = { ...actual }, t0 = performance.now(), dur = 700;
     const paso = (t) => {
       const k = Math.min(1, (t - t0) / dur), e = 1 - (1 - k) ** 3;

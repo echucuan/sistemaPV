@@ -23,7 +23,6 @@ const DATOS_CAMPO = {
 const CLAVES_NASA = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 const $ = (id) => document.getElementById(id);
 const fmt = (x, d = 1) => (Number.isFinite(x) ? x.toLocaleString('es-MX', { minimumFractionDigits: d, maximumFractionDigits: d }) : '—');
-const reducirMovimiento = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const estado = {
   lat: CAMPO.lat, lon: CAMPO.lon,
@@ -566,8 +565,8 @@ function iniciar() {
   $('chk-serie').addEventListener('change', pintarCurvas);
 
   calcular().then(() => {
-    // La animación arranca sola (salvo que el usuario prefiera menos movimiento).
-    if (!reducirMovimiento()) reproducir(true);
+    // La animación es parte central de la explicación: arranca sola en todos los dispositivos.
+    reproducir(true);
   });
 
   // Redibuja las gráficas al girar el teléfono o cambiar el tamaño de la ventana.
@@ -583,7 +582,13 @@ function iniciar() {
   });
 
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-    navigator.serviceWorker.register('sw.js').catch(() => { /* sin modo sin conexión */ });
+    // Si había una versión anterior instalada, recarga una vez cuando llegue la nueva.
+    const habiaVersion = !!navigator.serviceWorker.controller;
+    let recargado = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (habiaVersion && !recargado) { recargado = true; location.reload(); }
+    });
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => { /* sin modo sin conexión */ });
   }
 }
 

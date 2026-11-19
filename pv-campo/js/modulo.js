@@ -105,8 +105,7 @@ export function crearModulo(contenedor) {
   function mover(t) {
     const dt = ultimo ? Math.min(0.1, (t - ultimo) / 1000) : 0;
     ultimo = t;
-    const reducir = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reducir) desfase -= dt * velocidad * 9;
+    desfase -= dt * velocidad * 9;
     flujo.style.strokeDashoffset = desfase.toFixed(1);
     flujo.style.opacity = velocidad > 0.05 ? 1 : 0;
     anim = svg.isConnected ? requestAnimationFrame(mover) : 0;
