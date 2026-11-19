@@ -19,7 +19,19 @@
     a.app:hover, a.app:focus-visible { border-color:var(--acento); }
     a.app strong { color:var(--acento); font-size:1.1rem; }
     a.app span { display:block; color:var(--suave); font-size:.92rem; }
+    .qr { background:var(--tarjeta); border:1px solid var(--borde); border-radius:14px; padding:20px 16px;
+      text-align:center; }
+    .qr h2 { margin:0 0 4px; font-size:1.15rem; }
+    .qr p { margin:0 0 14px; }
+    /* El código siempre en negro sobre blanco para que lo lea cualquier cámara, aun en modo oscuro. */
+    .qr .codigo { display:inline-block; background:#fff; padding:14px; border-radius:12px; line-height:0; }
+    .qr .codigo svg { width:min(72vw, 300px); height:auto; display:block; }
+    .qr .url { display:block; margin:12px 0 10px; font-weight:600; color:var(--acento); word-break:break-all; }
+    .qr button { font:inherit; font-weight:600; border:0; border-radius:10px; padding:10px 16px; min-height:44px;
+      background:var(--acento); color:var(--tarjeta); cursor:pointer; }
+    .qr button:focus-visible { outline:3px solid var(--acento); outline-offset:3px; }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" defer></script>
 </head>
 <body>
   <main>
@@ -29,6 +41,48 @@
       <strong>☀️ Sol y paneles en campo</strong>
       <span>Radiación solar mensual (NASA POWER), ángulo óptimo de los paneles mes a mes y curvas I-V y P-V del módulo.</span>
     </a>
+
+    <section class="qr" aria-labelledby="t-qr">
+      <h2 id="t-qr">📱 Ábrela en tu celular</h2>
+      <p>Escanea el código con la cámara del teléfono.</p>
+      <div id="codigo-qr" class="codigo" role="img" aria-label="Código QR de la app Sol y paneles en campo"></div>
+      <a id="url-qr" class="url" href="pv-campo/"></a>
+      <button type="button" id="btn-copiar">Copiar enlace</button>
+    </section>
   </main>
+
+  <script>
+    // Enlace absoluto a la app, calculado desde esta página (funciona en GitHub Pages y en local).
+    const urlApp = new URL('pv-campo/', location.href).href;
+    const enlace = document.getElementById('url-qr');
+    enlace.href = urlApp;
+    enlace.textContent = urlApp.replace(/^https?:\/\//, '');
+
+    addEventListener('DOMContentLoaded', () => {
+      const caja = document.getElementById('codigo-qr');
+      if (typeof qrcode !== 'function') {
+        caja.hidden = true; // sin la librería queda el enlace escrito
+        return;
+      }
+      const qr = qrcode(0, 'M');
+      qr.addData(urlApp);
+      qr.make();
+      const n = qr.getModuleCount();
+      let d = '';
+      for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) d += `M${c},${r}h1v1h-1z`;
+      caja.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges">` +
+        `<path d="${d}" fill="#000"/></svg>`;
+    });
+
+    document.getElementById('btn-copiar').addEventListener('click', async (e) => {
+      try {
+        await navigator.clipboard.writeText(urlApp);
+        e.target.textContent = '✔ Enlace copiado';
+      } catch {
+        e.target.textContent = 'Copia el enlace de arriba';
+      }
+      setTimeout(() => { e.target.textContent = 'Copiar enlace'; }, 2500);
+    });
+  </script>
 </body>
 </html>
